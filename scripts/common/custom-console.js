@@ -1,10 +1,10 @@
-const chalk = require('chalk');
+import chalk from "chalk";
 
 /**
  *
  * @param {String} msg
  */
-function error(msg){
+export function error(msg){
 	return console.log(chalk.bold.red(msg));
 }
 
@@ -12,7 +12,7 @@ function error(msg){
  *
  * @param {String} msg
  */
-function warning(msg){
+export function warning(msg){
 	return console.log(chalk.keyword('orange')(msg));
 }
 
@@ -20,7 +20,7 @@ function warning(msg){
  *
  * @param {String} msg
  */
-function info(msg) {
+export function info(msg) {
 	return console.log(chalk.blueBright(msg));
 }
 
@@ -28,14 +28,6 @@ function info(msg) {
  *
  * @param {String} msg
  */
-function success(msg){
+export function success(msg){
 	return console.log(chalk.green(msg));
 }
-
-
-module.exports = {
-	"error": error,
-	"warning": warning,
-	"info": info,
-	"success": success
-};
