@@ -1,4 +1,4 @@
-# WIP
+# 2.1.0
 * i : Update script and remove Dev version
 
 # 2.0.0
