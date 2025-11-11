@@ -1,19 +1,5 @@
 'use strict';
 
-let env = null;
-/**
- *
- * @return {Promise<string>}
- */
-async function getEnv() {
-	if (env === null) {
-		const { default:_env } = await import('./env.js');
-		env = _env;
-	}
-
-	return env;
-}
-
 let _ = chrome.i18n.getMessage;
 
 /**
@@ -43,6 +29,7 @@ function doNotif(title, message) {
 	})
 		.catch(error => {
 			if (typeof error === "object" && typeof error.message === "string" && error.message.length > 0) {
+				// strip-debug-ignore-next
 				console.error(error);
 			}
 		})
@@ -83,10 +70,10 @@ function copyToClipboard(string) {
 
 
 
-chrome.contextMenus.removeAll();
-chrome.contextMenus.create({
+await chrome.contextMenus.removeAll();
+await chrome.contextMenus.create({
 	id: 'link_CopyTextLink',
-	title:_("Copy_link_text"),
+	title:_("copyLinkText"),
 	contexts: ["link"],
 	targetUrlPatterns: ["http://*/*", "https://*/*"]
 });
@@ -97,8 +84,8 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 	}, async function (responseData) {
 		let clipboardResult = (typeof responseData === 'object' && responseData !== null) && copyToClipboard(responseData.string);
 
-		if (!clipboardResult || (await getEnv()) !== 'prod') {
-			doNotif(_("copy_result"), (clipboardResult) ? _("Copied_link_text") : _("Error_when_copying_to_clipboad"));
+		if (!clipboardResult) {
+			doNotif(_("errorTitle"), _("errorDesc"));
 		}
 
 		console[(clipboardResult) ? "debug" : "warn"](`Copy to clipboad ${(clipboardResult) ? "success" : "error"} (${responseData?.string})`);

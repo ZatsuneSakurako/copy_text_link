@@ -1,5 +1,8 @@
+# WIP
+* i : Update script and remove Dev version
+
 # 2.0.0
-* \i : Update script
+* i : Update script
 * \+ : Ability to unload background page using the persistent feature
 
 # 1.1.0

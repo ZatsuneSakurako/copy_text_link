@@ -1,24 +1,23 @@
 {
 	"applications": {
 		"gecko": {
-			"id": "copytextlink_dev@zatsunenomokou.eu",
-			"update_url": "https://gitlab.com/ZatsuneNoMokou/copy_text_link/raw/master/dist/copytextlink_dev.update.json",
-			"strict_min_version": "74.0"
+			"id": "copytextlink@zatsunenomokou.eu",
+			"strict_min_version": "140.0"
 		}
 	},
 	"manifest_version": 2,
-	"name": "Copy Text Link (Dev)",
-	"short_name": "CopyTextLinkDev",
+	"name": "Copy Text Link",
+	"short_name": "CopyTextLink",
 	"description": "__MSG_extShortDesc__",
-	"author": "ZatsuneNoMokou",
-	"version": "2.0.0",
+	"author": "ZatsuneSakurako",
+	"version": "2.1.0",
 	"icons": {
 		"96": "/icon_96.png",
 		"128": "/icon.png"
 	},
 	"background": {
 		"persistent": false,
-		"scripts": [ "index.js" ]
+		"scripts": [ "init.js" ]
 	},
 	"browser_action": {
 		"default_icon": {
@@ -47,5 +46,5 @@
 		"http://*/*",
 		"https://*/*"
 	],
-	"minimum_chrome_version": "80.0"
+	"minimum_chrome_version": "122.0"
 }
