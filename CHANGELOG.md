@@ -1,3 +1,7 @@
+# WIP
+* i : Code cleaning
+* i : Write clipboard using [navigator.clipboard.writeText](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText)
+
 # 2.1.0
 * i : Update script and remove Dev version
 

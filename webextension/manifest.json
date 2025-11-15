@@ -34,7 +34,7 @@
   },
   "content_scripts": [
     {
-      "js": [ "data/js/page_contentScript.js" ],
+      "js": [ "js/page_contentScript.js" ],
       "matches": [ "http://*/*", "https://*/*" ],
       "run_at": "document_end"
     }

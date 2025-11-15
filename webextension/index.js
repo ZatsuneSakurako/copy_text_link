@@ -9,7 +9,7 @@ let _ = chrome.i18n.getMessage;
  * @return {Promise<void>}
  */
 function doNotif(title, message) {
-	let options = {
+	const options = {
 		type: "basic",
 		title: title,
 		message: message,
@@ -20,53 +20,21 @@ function doNotif(title, message) {
 
 	return new Promise((resolve, reject) => {
 		chrome.notifications.create(options, function() {
-			if(typeof chrome.runtime.lastError === "object" && chrome.runtime.lastError !== null && typeof chrome.runtime.lastError.message === "string" && chrome.runtime.lastError.message.length > 0){
-				reject(chrome.runtime.lastError);
+			if (typeof chrome.runtime.lastError === "object" && chrome.runtime.lastError !== null && typeof chrome.runtime.lastError.message === "string" && chrome.runtime.lastError.message.length > 0) {
+				const error = chrome.runtime.lastError;
+				// strip-debug-ignore-next
+				console.error(error);
+				reject(error);
 			} else {
 				resolve();
 			}
 		});
-	})
-		.catch(error => {
-			if (typeof error === "object" && typeof error.message === "string" && error.message.length > 0) {
-				// strip-debug-ignore-next
-				console.error(error);
-			}
-		})
-	;
+	});
 }
 chrome.notifications.onClicked.addListener(function (notificationId) {
 	console.info(`${notificationId} (onClicked)`);
 	chrome.notifications.clear(notificationId);
 });
-
-
-
-
-
-function copyToClipboard(string) {
-	if (document.querySelector('#copy_form') !== null) {
-		let node = document.querySelector('#copy_form');
-		node.parentNode.removeChild(node);
-	}
-
-	let copy_form = document.createElement('textarea');
-	copy_form.id = 'copy_form';
-	copy_form.textContent = string;
-	//copy_form.class = "hide";
-	copy_form.setAttribute('style', 'height: 0 !important; width: 0 !important; border: none !important; z-index: -9999999;');
-	document.querySelector('body').appendChild(copy_form);
-
-	//copy_form.focus();
-	copy_form.select();
-
-	let clipboard_success = document.execCommand('Copy');
-	copy_form.parentNode.removeChild(copy_form);
-
-	return clipboard_success;
-}
-
-
 
 
 
@@ -82,12 +50,11 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 		id: "copyLinkText",
 		data: ""
 	}, async function (responseData) {
-		let clipboardResult = (typeof responseData === 'object' && responseData !== null) && copyToClipboard(responseData.string);
-
-		if (!clipboardResult) {
+		const success = responseData && responseData.error === false;
+		if (!success) {
 			doNotif(_("errorTitle"), _("errorDesc"));
 		}
 
-		console[(clipboardResult) ? "debug" : "warn"](`Copy to clipboad ${(clipboardResult) ? "success" : "error"} (${responseData?.string})`);
+		console[(success) ? "debug" : "warn"](`Copy to clipboad ${(success) ? "success" : "error"} (${responseData?.error})`);
 	});
 })
