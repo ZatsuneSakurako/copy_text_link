@@ -48,9 +48,10 @@ async function updateMenu() {
 }
 let once = false;
 chrome.contextMenus.onShown.addListener(function (context) {
-	if (once || !context.menuIds.length || !context.contexts.includes('link')) return;
+	if ((!once || !context.menuIds.length) && context.contexts.includes('link')) {
+		updateMenu();
+	}
 	once = true;
-	updateMenu();
 });
 
 
