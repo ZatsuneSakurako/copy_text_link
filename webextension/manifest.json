@@ -40,8 +40,5 @@
     "http://*/*",
     "https://*/*"
   ],
-  "optional_permissions": [
-    "<all_urls>"
-  ],
   "minimum_chrome_version": "122.0"
 }
