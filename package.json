@@ -1,6 +1,6 @@
 {
   "name": "copy_text_link",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Copy the text of links without having to select it.",
   "engines": {
     "node": ">=24.0"

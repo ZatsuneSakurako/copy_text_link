@@ -1,39 +1,32 @@
-'use strict';
-
-let _ = chrome.i18n.getMessage;
+/**
+ *
+ * @param {string} text
+ * @return {Promise<boolean>}
+ */
+async function writeIntoClipboard(text) {
+	try {
+		await navigator.clipboard.writeText(text);
+		return true;
+	} catch (error) {
+		// strip-debug-ignore-next
+		console.log(error);
+		return false;
+	}
+}
 
 /**
  *
  * @param {string} title
  * @param {string} message
- * @return {Promise<void>}
+ * @return {Promise<string>}
  */
 function doNotif(title, message) {
-	let options = {
+	return (self.browser ?? chrome).notifications.create({
 		type: "basic",
 		title: title,
 		message: message,
 		contextMessage: chrome.runtime.getManifest().name,
-		iconUrl: "/icon.png",
-		isClickable: true
-	};
-
-	return new Promise((resolve, reject) => {
-		chrome.notifications.create(options, function() {
-			if(typeof chrome.runtime.lastError === "object" && chrome.runtime.lastError !== null && typeof chrome.runtime.lastError.message === "string" && chrome.runtime.lastError.message.length > 0){
-				reject(chrome.runtime.lastError);
-			} else {
-				resolve();
-			}
-		});
-	})
-		.catch(error => {
-			if (typeof error === "object" && typeof error.message === "string" && error.message.length > 0) {
-				// strip-debug-ignore-next
-				console.error(error);
-			}
-		})
-	;
+	});
 }
 chrome.notifications.onClicked.addListener(function (notificationId) {
 	console.info(`${notificationId} (onClicked)`);
@@ -42,52 +35,39 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
 
 
 
-
-
-function copyToClipboard(string) {
-	if (document.querySelector('#copy_form') !== null) {
-		let node = document.querySelector('#copy_form');
-		node.parentNode.removeChild(node);
-	}
-
-	let copy_form = document.createElement('textarea');
-	copy_form.id = 'copy_form';
-	copy_form.textContent = string;
-	//copy_form.class = "hide";
-	copy_form.setAttribute('style', 'height: 0 !important; width: 0 !important; border: none !important; z-index: -9999999;');
-	document.querySelector('body').appendChild(copy_form);
-
-	//copy_form.focus();
-	copy_form.select();
-
-	let clipboard_success = document.execCommand('Copy');
-	copy_form.parentNode.removeChild(copy_form);
-
-	return clipboard_success;
-}
-
-
-
-
-
-await chrome.contextMenus.removeAll();
-await chrome.contextMenus.create({
-	id: 'link_CopyTextLink',
-	title:_("copyLinkText"),
-	contexts: ["link"],
-	targetUrlPatterns: ["http://*/*", "https://*/*"]
-});
-chrome.contextMenus.onClicked.addListener(function (info, tab) {
-	chrome.tabs.sendMessage(tab.id, {
-		id: "copyLinkText",
-		data: ""
-	}, async function (responseData) {
-		let clipboardResult = (typeof responseData === 'object' && responseData !== null) && copyToClipboard(responseData.string);
-
-		if (!clipboardResult) {
-			doNotif(_("errorTitle"), _("errorDesc"));
-		}
-
-		console[(clipboardResult) ? "debug" : "warn"](`Copy to clipboad ${(clipboardResult) ? "success" : "error"} (${responseData?.string})`);
+async function updateMenu() {
+	console.debug("updateMenu");
+	await chrome.contextMenus.removeAll();
+	await chrome.contextMenus.create({
+		id: 'link_CopyTextLink',
+		title: chrome.i18n.getMessage("copyLinkText"),
+		contexts: ["link"],
+		targetUrlPatterns: ["http://*/*", "https://*/*"]
 	});
-})
+	await chrome.contextMenus.refresh();
+}
+let once = false;
+chrome.contextMenus.onShown.addListener(function (context) {
+	if ((!once || !context.menuIds.length) && context.contexts.includes('link')) {
+		updateMenu();
+	}
+	once = true;
+});
+
+
+
+chrome.contextMenus.onClicked.addListener(async function (info) {
+	const success = await writeIntoClipboard(info.linkText)
+		// strip-debug-ignore-next
+		.catch(console.error);
+	if (!success) {
+		doNotif(
+			chrome.i18n.getMessage("errorTitle"),
+			chrome.i18n.getMessage("errorDesc")
+		)
+			.then(console.debug)
+			.catch(console.error);
+	}
+	// strip-debug-ignore-next
+	console[(success) ? "debug" : "warn"](`Copy to clipboad ${(success) ? "success" : "error"}`);
+});

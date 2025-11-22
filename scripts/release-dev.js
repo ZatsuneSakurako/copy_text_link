@@ -40,12 +40,8 @@ try {
 
 console.log("Ready to clean files!");
 
-let excludeDirString = "data/js/lib";
-if (process.platform === "win32") {
-	excludeDirString = "data\\js\\lib";
-}
 const excludeDirAndJsFilter = function (item) {
-	return !item.path.includes(excludeDirString) && item.stats.isFile() && path.extname(item.path) === '.js';
+	return item.stats.isFile() && path.extname(item.path) === '.js';
 };
 
 modifyFiles(tmpPath, function (data, filePath) {
