@@ -13,7 +13,7 @@
   "short_name": "CopyTextLink",
   "description": "__MSG_extShortDesc__",
   "author": "ZatsuneSakurako",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "icons": {
     "96": "/icon_96.png",
     "128": "/icon.png"
@@ -39,9 +39,6 @@
     "notifications",
     "http://*/*",
     "https://*/*"
-  ],
-  "optional_permissions": [
-    "<all_urls>"
   ],
   "minimum_chrome_version": "122.0"
 }
