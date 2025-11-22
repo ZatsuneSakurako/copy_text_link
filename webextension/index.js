@@ -1,6 +1,18 @@
-'use strict';
-
-let _ = chrome.i18n.getMessage;
+/**
+ *
+ * @param {string} text
+ * @return {Promise<boolean>}
+ */
+async function writeIntoClipboard(text) {
+	try {
+		await navigator.clipboard.writeText(text);
+		return true;
+	} catch (error) {
+		// strip-debug-ignore-next
+		console.log(error);
+		return false;
+	}
+}
 
 /**
  *
@@ -23,22 +35,38 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
 
 
 
-await chrome.contextMenus.removeAll();
-await chrome.contextMenus.create({
-	id: 'link_CopyTextLink',
-	title:_("copyLinkText"),
-	contexts: ["link"],
-	targetUrlPatterns: ["http://*/*", "https://*/*"]
-});
-chrome.contextMenus.onClicked.addListener(function (info, tab) {
-	chrome.tabs.sendMessage(tab.id, { id: "copyLinkText" }, async function (responseData) {
-		const success = responseData && responseData.error === false;
-		if (!success) {
-			doNotif(_("errorTitle"), _("errorDesc"))
-				.then(console.debug)
-				// strip-debug-ignore-next
-				.catch(console.error);
-		}
-		console[(success) ? "debug" : "warn"](`Copy to clipboad ${(success) ? "success" : "error"} (${responseData?.error})`);
+async function updateMenu() {
+	console.debug("updateMenu");
+	await chrome.contextMenus.removeAll();
+	await chrome.contextMenus.create({
+		id: 'link_CopyTextLink',
+		title: chrome.i18n.getMessage("copyLinkText"),
+		contexts: ["link"],
+		targetUrlPatterns: ["http://*/*", "https://*/*"]
 	});
-})
+	await chrome.contextMenus.refresh();
+}
+let once = false;
+chrome.contextMenus.onShown.addListener(function (context) {
+	if (once || !context.menuIds.length || !context.contexts.includes('link')) return;
+	once = true;
+	updateMenu();
+});
+
+
+
+chrome.contextMenus.onClicked.addListener(async function (info) {
+	const success = await writeIntoClipboard(info.linkText)
+		// strip-debug-ignore-next
+		.catch(console.error);
+	if (!success) {
+		doNotif(
+			chrome.i18n.getMessage("errorTitle"),
+			chrome.i18n.getMessage("errorDesc")
+		)
+			.then(console.debug)
+			.catch(console.error);
+	}
+	// strip-debug-ignore-next
+	console[(success) ? "debug" : "warn"](`Copy to clipboad ${(success) ? "success" : "error"}`);
+});
